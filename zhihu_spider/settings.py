@@ -9,11 +9,22 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
+ITEM_PIPELINES = {
+   'zhihu_spider.pipelines.ZhihuSpiderPipeline': 300,
+   'zhihu_spider.pipelines.MongoDBPipeline': 800,
+}
+
+MONGODB_SERVER = "localhost"
+MONGODB_PORT = 27017
+MONGODB_DB = "rg_spider"
+MONGODB_COLLECTION = "zhihu_billboard"
+
 BOT_NAME = 'zhihu_spider'
 
 SPIDER_MODULES = ['zhihu_spider.spiders']
 NEWSPIDER_MODULE = 'zhihu_spider.spiders'
 
+FEED_EXPORT_ENCODING = "utf-8"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1"
