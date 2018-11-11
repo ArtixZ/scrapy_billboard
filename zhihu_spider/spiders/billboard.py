@@ -8,4 +8,11 @@ class BillboardSpider(scrapy.Spider):
     start_urls = ['http://zhihu.com/billboard/']
 
     def parse(self, response):
-        pass
+        hotList = response.xpath('//a[@class="HotList-item"]')
+        for hotItem in hotList:
+            [idx, title, readAmount] = hotItem.xpath('.//text()').extract()
+            yield {
+                'Index': idx,
+                'Title': title,
+                'ReadAmount': readAmount,
+            }
