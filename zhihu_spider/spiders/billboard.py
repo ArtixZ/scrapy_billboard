@@ -36,10 +36,12 @@ class BillboardSpider(scrapy.Spider):
             title = target["titleArea"]["text"]
             excerpt = target["excerptArea"]["text"]
             thumbnail = target["imageArea"]["url"]
+            url = target["link"]["url"]
 
             yield {
                 'rank': rank,
                 'title': title,
                 'excerpt': excerpt,
                 'thumbnail': thumbnail,
+                'url': url,
             }
