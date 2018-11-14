@@ -4,10 +4,11 @@ import json
 
 class BillboardSpider(scrapy.Spider):
     name = 'billboard'
-    allowed_domains = ['https://zhihu.com/billboard']
+    allowed_domains = ['https://zhihu.com/billboard', 'zhihu.com']
     start_urls = ['http://zhihu.com/billboard/']
 
     def parse(self, response):
+        
         initialData = response.xpath('//script[@id="js-initialData"]/text()').extract_first()
         # parsedData = json.dumps(json.loads(initialData), ensure_ascii=False)
         parsedData = json.loads(initialData)
@@ -38,10 +39,19 @@ class BillboardSpider(scrapy.Spider):
             thumbnail = target["imageArea"]["url"]
             url = target["link"]["url"]
 
-            yield {
+            yield scrapy.Request(url, meta={'item': {
                 'rank': rank,
                 'title': title,
                 'excerpt': excerpt,
                 'thumbnail': thumbnail,
                 'url': url,
-            }
+            }}, callback=self.parse_second)
+            
+        
+    def parse_second(self, response):
+        # from scrapy.shell import inspect_response
+        # inspect_response(response, self)
+        item = response.meta['item'] 
+        item["content"] = response.body.decode("utf-8")
+        yield item
+    
