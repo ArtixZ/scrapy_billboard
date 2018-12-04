@@ -14,10 +14,13 @@ ITEM_PIPELINES = {
    'zhihu_spider.pipelines.MongoDBPipeline': 800,
 }
 
-MONGODB_SERVER = "localhost"
+MONGODB_USERNAME = "ringle"
+MONGODB_PWD = "ringle"
+MONGODB_SERVER = "54.88.110.101"
 MONGODB_PORT = 27017
 MONGODB_DB = "rg_spider"
 MONGODB_COLLECTION = "zhihu_billboard"
+MONGODB_COLLECTION_ZHIHU_DAILY = "zhihu_daily"
 
 BOT_NAME = 'zhihu_spider'
 
@@ -54,6 +57,7 @@ DEFAULT_REQUEST_HEADERS = {
 #   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 #   'Accept-Language': 'en',
   'User-Agent': "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1",
+  'x-app-za': 'OS=Android&Release=6.0',
 }
 
 # Enable or disable spider middlewares
