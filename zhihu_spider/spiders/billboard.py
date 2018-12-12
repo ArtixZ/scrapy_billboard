@@ -21,7 +21,6 @@ class BillboardSpider(scrapy.Spider):
         #     thumbnail = hotItem.css('.HotList-itemImgContainer img').xpath('@src').extract_first()
 
 
-
         #     yield {
         #         'rank': rank.encode('utf-8') if rank else None,
         #         'title': title.encode('utf-8') if title else None,
