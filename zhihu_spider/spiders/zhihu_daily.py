@@ -4,6 +4,7 @@ import json
 import os
 import logging
 from scrapy_splash import SplashRequest
+from bs4 import BeautifulSoup as bs
 
 with open(os.path.join(os.path.dirname(__file__), "../config.json")) as topics:
     topics = json.load(topics)["zhihu_topic"]
@@ -44,36 +45,68 @@ class ZhihuDailySpider(scrapy.Spider):
 
             # from scrapy.shell import inspect_response
             # inspect_response(response, self)
+            if target["type"] == "article":
+                answer_page_url = target["url"]
 
-            answer_page_url = self.answer_url.format(target["question"]["url"].split("/")[-1] ,target["url"].split('/')[-1])
+                yield SplashRequest(
+                    url=answer_page_url,
+                    method='GET',
+                    dont_filter=True,
+                    callback=self.parse_tag,
+                    meta={
+                        'id': target['id'],
+                        'type': target['type'],
+                        'comment_count': target['comment_count'],
+                        # 'created_time': target['created_time'],
+                        'author': target['author'],
+                        'content': target['content'],
+                        'excerpt': target['excerpt'],
+                        'url': answer_page_url,
+                        'voteup_count': target['voteup_count'],
+                        # 'question': target['question'],
+                        # 'updated_time': target['updated_time'],
+                        'topic_id': meta['topic_id'],
+                    }
+                )
+            elif target["type"] == "answer":
+                answer_page_url = self.answer_url.format(target["question"]["url"].split("/")[-1] ,target["url"].split('/')[-1])
 
-            yield SplashRequest(
-                url=answer_page_url,
-                method='GET',
-                dont_filter=True,
-                callback=self.parse_tag,
-                meta={
-                    'id': target['id'],
-                    'type': target['type'],
-                    'comment_count': target['comment_count'],
-                    'created_time': target['created_time'],
-                    'author': target['author'],
-                    'content': target['content'],
-                    'excerpt': target['excerpt'],
-                    'url': answer_page_url,
-                    'voteup_count': target['voteup_count'],
-                    'question': target['question'],
-                    'updated_time': target['updated_time'],
-                    'topic_id': meta['topic_id'],
-                }
-            )
+                yield SplashRequest(
+                    url=answer_page_url,
+                    method='GET',
+                    dont_filter=True,
+                    callback=self.parse_tag,
+                    meta={
+                        'id': target['id'],
+                        'type': target['type'],
+                        'comment_count': target['comment_count'],
+                        'created_time': target['created_time'],
+                        'author': target['author'],
+                        'content': target['content'],
+                        'excerpt': target['excerpt'],
+                        'url': answer_page_url,
+                        'voteup_count': target['voteup_count'],
+                        'question': target['question'],
+                        'updated_time': target['updated_time'],
+                        'topic_id': meta['topic_id'],
+                    }
+                )
     
     def parse_tag(self, response):
 
-        from scrapy.shell import inspect_response
-        inspect_response(response, self)
+        # from scrapy.shell import inspect_response
+        # inspect_response(response, self)
+        soup = bs(response.body, 'lxml')
+        if response.meta["type"] == "article":
+            print()
+        elif response.meta["type"] == "answer":
+            raw_topics = soup.findAll("div", {"class": "Tag QuestionTopic"})
+            topics = [x.text for x in raw_topics]
 
-        logging.debug("parse URL")
+        payload = response.meta
+
+        payload["tags"] = topics
+        yield payload
         # print("!!!!!!!!!!!!" , response.body)
 
         # topics = response.css('.QuestionHeader-topics')
