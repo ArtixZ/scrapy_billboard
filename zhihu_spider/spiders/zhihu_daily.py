@@ -101,13 +101,23 @@ class ZhihuDailySpider(scrapy.Spider):
         if response.meta["type"] == "article":
             raw_topics = soup.select_one("div.TopicList").select("div.Topic")
             topics = [x.text for x in raw_topics]
-            thumbnail = soup.select_one(".Post-RichText").select_one("img")["data-original"]
+            try:
+                if soup.select_one("img.TitleImage"): 
+                    thumbnail = soup.select_one("img.TitleImage")["src"]
+                else:
+                    thumbnail = soup.select_one(".Post-RichText").select_one("img")["data-original"]
+            except:
+                thumbnail = None
 
         # 知乎问答的tag 和 thumbnail：
         elif response.meta["type"] == "answer":
             raw_topics = soup.findAll("div", {"class": "Tag QuestionTopic"})
             topics = [x.text for x in raw_topics]
-            thumbnail = soup.select_one("div.RichContent").select_one("img")["src"]
+            try:
+                thumbnail = soup.select_one("div.RichContent").select_one("img")["src"]
+            except:
+                thumbnail = None
+
         payload = response.meta
 
         payload["tags"] = topics
