@@ -97,15 +97,21 @@ class ZhihuDailySpider(scrapy.Spider):
         # from scrapy.shell import inspect_response
         # inspect_response(response, self)
         soup = bs(response.body, 'lxml')
+        # 知乎专栏的tag 和 thumbnail:
         if response.meta["type"] == "article":
-            print()
+            raw_topics = soup.select_one("div.TopicList").select("div.Topic")
+            topics = [x.text for x in raw_topics]
+            thumbnail = soup.select_one(".Post-RichText").select_one("img")["data-original"]
+
+        # 知乎问答的tag 和 thumbnail：
         elif response.meta["type"] == "answer":
             raw_topics = soup.findAll("div", {"class": "Tag QuestionTopic"})
             topics = [x.text for x in raw_topics]
-
+            thumbnail = soup.select_one("div.RichContent").select_one("img")["src"]
         payload = response.meta
 
         payload["tags"] = topics
+        payload["thumbnail"] = thumbnail
         yield payload
         # print("!!!!!!!!!!!!" , response.body)
 
